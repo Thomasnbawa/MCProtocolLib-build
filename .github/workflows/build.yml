@@ -1,15 +1,16 @@
-name: Java CI with Gradle
 
-on: [push, pull_request]
+ name: AwA
+ 
 
-jobs:
-  build:
-    # Only run on PRs if the source branch is on someone else's repo
-    if: "${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}"
+ on: [push, pull_request]
 
-    runs-on: ubuntu-latest
-
-    steps:
+ jobs:
+   build:
+ 
+     runs-on: ubuntu-latest
+     permissions:
+      contents: write  # 发布所需的权限
+      steps:
       - name: Checkout repository
         # See https://github.com/actions/checkout/commits
         uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac
@@ -30,3 +31,18 @@ jobs:
         uses: gradle/gradle-build-action@3bfe3a46584a206fb8361cdedd0647b0c4204232
         with:
           arguments: build
+      - name: Set date and short sha as tag name
+        id: set_tag
+        run: |
+          SHORT_SHA=${GITHUB_SHA::7}
+          DATE=$(date +'%Y-%m-%d')
+          echo "TAG_NAME=${DATE}-${SHORT_SHA}" >> $GITHUB_ENV
+          echo "Generated Tag: ${{ env.TAG_NAME }}"
+      - name: Auto Release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          automatic_release_tag: ${{ env.TAG_NAME }}
+          prerelease: false
+          files: ./build/libs/*.jar
+
