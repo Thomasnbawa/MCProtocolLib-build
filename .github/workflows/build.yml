@@ -25,11 +25,8 @@
           java-version: 17
           distribution: temurin
 
-      - name: Build
-        # See https://github.com/gradle/gradle-build-action/commits
-        uses: gradle/gradle-build-action@3bfe3a46584a206fb8361cdedd0647b0c4204232
-        with:
-          arguments: build
+      - name: Build with Gradle
+        run: chmod +x gradlew && ./gradlew clean build
       - name: Set date and short sha as tag name
         id: set_tag
         run: |
@@ -43,5 +40,5 @@
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: ${{ env.TAG_NAME }}
           prerelease: false
-          files: ./*
+          files: ./build/libs/*
 
