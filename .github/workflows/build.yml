@@ -43,5 +43,5 @@
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           automatic_release_tag: ${{ env.TAG_NAME }}
           prerelease: false
-          files: ./build/libs/*.jar
+          files: ./*
 
